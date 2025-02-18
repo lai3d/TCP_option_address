@@ -446,6 +446,11 @@ static int toa_stats_seq_open(struct inode *inode, struct file *file)
 	return single_open(file, toa_stats_show, NULL);
 }
 
+static int toa_stats_open(struct seq_file *m, void *v)
+{
+    return single_open(m, toa_seq_show, NULL);
+}
+
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 6, 0)
 static const struct proc_ops toa_stats_fops = {
     .proc_open = toa_stats_open,
@@ -456,7 +461,7 @@ static const struct proc_ops toa_stats_fops = {
 #else
 static const struct file_operations toa_stats_fops = {
     .owner = THIS_MODULE,
-    .open = toa_stats_open,
+    .open = toa_stats_seq_open,
     .read = seq_read,
     .llseek = seq_lseek,
     .release = single_release,
