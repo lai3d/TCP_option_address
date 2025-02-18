@@ -1,4 +1,5 @@
 #include "toa.h"
+#include <linux/version.h>
 
 /*
  *	TOA: Address is a new TCP Option
@@ -445,13 +446,22 @@ static int toa_stats_seq_open(struct inode *inode, struct file *file)
 	return single_open(file, toa_stats_show, NULL);
 }
 
-static const struct file_operations toa_stats_fops = {
-	.owner = THIS_MODULE,
-	.open = toa_stats_seq_open,
-	.read = seq_read,
-	.llseek = seq_lseek,
-	.release = single_release,
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 6, 0)
+static const struct proc_ops toa_stats_fops = {
+    .proc_open = toa_stats_open,
+    .proc_read = seq_read,
+    .proc_lseek = seq_lseek,
+    .proc_release = single_release,
 };
+#else
+static const struct file_operations toa_stats_fops = {
+    .owner = THIS_MODULE,
+    .open = toa_stats_open,
+    .read = seq_read,
+    .llseek = seq_lseek,
+    .release = single_release,
+};
+#endif
 
 /*
  * TOA module init and destory
